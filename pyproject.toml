@@ -1,0 +1,18 @@
+[project]
+name = "log-analyzer"
+version = "1.0.0"
+description = "CLI tool to analyze log files and generate reports"
+authors = [{ name = "Your Name" }]
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.scripts]
+log-analyzer = "log_analyzer.main:main"
+
+[tool.setuptools.packages.find]
+include = ["log_analyzer*"]
+exclude = ["logs*", "reports*"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

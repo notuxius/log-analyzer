@@ -1,0 +1,8 @@
+2026-04-26 09:00:00 INFO Application started
+2026-04-26 09:01:12 INFO Loaded configuration
+2026-04-26 09:03:45 WARNING Disk usage above 80 percent
+2026-04-26 09:05:10 ERROR Database connection failed
+2026-04-26 09:06:20 INFO Retrying database connection
+2026-04-26 09:07:34 WARNING External API response was slow
+2026-04-26 09:08:02 ERROR Timeout while calling external API
+2026-04-26 09:10:00 INFO Report generation completed
