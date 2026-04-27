@@ -12,7 +12,7 @@ def load_log_entries(log_file: str | Path) -> list[LogEntry]:
 
     lines = path.read_text(encoding="utf-8").splitlines()
     if not any(line.strip() for line in lines):
-        raise ValueError("Report cannot be empty.")
+        raise ValueError("Log file cannot be empty.")
 
     log_entries: list[LogEntry] = []
 

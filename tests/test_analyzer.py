@@ -195,3 +195,48 @@ def test_main_failure(tmp_path, capsys, caplog, monkeypatch):
     assert captured.out.strip() == ""
 
     assert "doesn't exist" in caplog.text
+
+
+def test_load_log_entries_raises_for_missing_file(tmp_path):
+    missing_file = tmp_path / "missing.txt"
+
+    with pytest.raises(FileNotFoundError, match="doesn't exist"):
+        load_log_entries(missing_file)
+
+
+def test_load_log_entries_raises_for_empty_file(tmp_path):
+    log_file = tmp_path / "empty.txt"
+    log_file.write_text("", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Log file cannot be empty"):
+        load_log_entries(log_file)
+
+
+def test_load_log_entries_skips_malformed_lines(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "\n".join(
+            [
+                "malformed line",
+                "2026-04-10 10:00:00 INFO Application started",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    entries = load_log_entries(log_file)
+
+    assert len(entries) == 1
+    assert entries[0]["message"] == "Application started"
+
+
+def test_load_log_entries_skips_empty_messages(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "2026-04-10 10:00:00 INFO    ",
+        encoding="utf-8",
+    )
+
+    entries = load_log_entries(log_file)
+
+    assert entries == []

@@ -19,3 +19,7 @@ build/
 
 # Reports
 reports/
+
+#Coverage
+.coverage
+htmlcov/
