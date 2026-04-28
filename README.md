@@ -1,6 +1,6 @@
 # Log Analyzer
 
-[![Python tests](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml/badge.svg)](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml)
+[![Tests](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml/badge.svg)](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml)
 
 CLI tool to analyze log files and generate reports.
 
