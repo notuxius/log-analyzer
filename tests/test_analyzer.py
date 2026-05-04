@@ -1,15 +1,20 @@
+import json
 import sys
 import textwrap
 
 import pytest
 
 from log_analyzer.analyzer import (
+    FormatterFactory,
+    JsonFormatter,
     LogLoader,
     LogProcessor,
     LogSummarizer,
     ReportSaver,
     TextFormatter,
 )
+from log_analyzer.config import AppConfig
+from log_analyzer.container import AppContainer
 from log_analyzer.main import main
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
@@ -144,6 +149,37 @@ def test_text_formatter_returns_expected_report():
     assert report == expected
 
 
+def test_json_formatter_returns_json_string():
+    summary: LogSummary = {
+        "total_lines": 1,
+        "info_count": 1,
+        "warning_count": 0,
+        "error_count": 0,
+        "error_messages": [],
+    }
+
+    report = JsonFormatter().format(summary)
+
+    assert json.loads(report) == summary
+
+
+def test_formatter_factory_returns_text_formatter():
+    formatter = FormatterFactory.create("txt")
+
+    assert isinstance(formatter, TextFormatter)
+
+
+def test_formatter_factory_returns_json_formatter():
+    formatter = FormatterFactory.create("json")
+
+    assert isinstance(formatter, JsonFormatter)
+
+
+def test_formatter_factory_raises_for_unsupported_format():
+    with pytest.raises(ValueError, match="Unsupported format"):
+        FormatterFactory.create("xml")
+
+
 def test_report_saver_writes_report(tmp_path):
     output_path = tmp_path / "report.txt"
     report = "Total lines: 3"
@@ -185,6 +221,28 @@ def test_log_processor_returns_formatted_report(tmp_path):
     assert "INFO: 1" in report
     assert "ERROR: 1" in report
     assert "- Something failed" in report
+
+
+def test_app_container_runs_pipeline(tmp_path):
+    input_path = tmp_path / "sample.txt"
+    output_path = tmp_path / "report.txt"
+
+    input_path.write_text(
+        "2026-04-10 10:00:00 ERROR Something failed",
+        encoding="utf-8",
+    )
+
+    config = AppConfig(
+        input_path=input_path,
+        output_path=output_path,
+        format_type="txt",
+    )
+
+    report, saved_path = AppContainer(config).run()
+
+    assert saved_path == output_path.resolve()
+    assert output_path.read_text(encoding="utf-8") == report
+    assert "ERROR: 1" in report
 
 
 def test_main_success(tmp_path, capsys, monkeypatch):
@@ -238,6 +296,42 @@ def test_main_success(tmp_path, capsys, monkeypatch):
 
     assert captured.out.strip() == expected_report
     assert output_file.read_text(encoding="utf-8") == expected_report
+
+
+def test_main_success_json_format(tmp_path, monkeypatch):
+    log_file = tmp_path / "log.txt"
+    output_base = tmp_path / "report"
+
+    log_file.write_text(
+        "2026-04-10 10:00:00 ERROR Something failed",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "log-analyzer",
+            "--input",
+            str(log_file),
+            "--output",
+            str(output_base),
+            "--format",
+            "json",
+        ],
+    )
+
+    return_code = main()
+
+    assert return_code == 0
+
+    output_file = tmp_path / "report.json"
+    assert output_file.exists()
+
+    content = json.loads(output_file.read_text(encoding="utf-8"))
+    assert content["total_lines"] == 1
+    assert content["error_count"] == 1
+    assert content["error_messages"] == ["Something failed"]
 
 
 def test_main_failure(tmp_path, capsys, caplog, monkeypatch):
