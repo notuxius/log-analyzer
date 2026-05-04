@@ -19,6 +19,26 @@ from log_analyzer.main import main
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
+def test_log_loader_skips_blank_lines(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "\n".join(
+            [
+                "",
+                "2026-04-10 10:00:00 INFO Application started",
+                "",
+                "2026-04-10 10:01:00 ERROR Something failed",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    entries = LogLoader(log_file).load()
+
+    assert len(entries) == 2
+
+
 def test_log_loader_loads_valid_entries(tmp_path):
     log_file = tmp_path / "log.txt"
     log_file.write_text(
@@ -124,6 +144,20 @@ def test_log_summarizer_returns_expected_summary():
         "error_count": 1,
         "error_messages": ["Something failed"],
     }
+
+
+def test_text_formatter_no_errors():
+    summary: LogSummary = {
+        "total_lines": 1,
+        "info_count": 1,
+        "warning_count": 0,
+        "error_count": 0,
+        "error_messages": [],
+    }
+
+    report = TextFormatter().format(summary)
+
+    assert "- (none)" in report
 
 
 def test_text_formatter_returns_expected_report():
