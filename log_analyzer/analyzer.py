@@ -147,15 +147,20 @@ class LogProcessor:
 
 
 class FormatterFactory:
+    FORMATTERS = {
+        "txt": TextFormatter,
+        "json": JsonFormatter,
+    }
+
     @staticmethod
     def create(format_type: str) -> Formatter:
-        match format_type:
-            case "txt":
-                return TextFormatter()
-            case "json":
-                return JsonFormatter()
-            case _:
-                raise ValueError(f"Unsupported format: {format_type}")
+        format_type = format_type.lower()
+        try:
+            formatter_class = FormatterFactory.FORMATTERS[format_type]
+        except KeyError as error:
+            raise ValueError(f"Unsupported format: {format_type}") from error
+
+        return formatter_class()
 
 
 class ReportSaver:
