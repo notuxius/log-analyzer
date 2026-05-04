@@ -1,14 +1,9 @@
 import argparse
-import json
 import logging
 from pathlib import Path
 
-from log_analyzer.analyzer import (
-    format_log_report,
-    load_log_entries,
-    save_report,
-    summarize_logs,
-)
+from log_analyzer.config import AppConfig
+from log_analyzer.container import AppContainer
 
 APP_NAME = "log-analyzer"
 __version__ = "1.0.0"
@@ -64,19 +59,19 @@ def main() -> int:
         if not output_path.suffix:
             output_path = output_path.with_suffix(f".{args.format}")
 
-        entries = load_log_entries(input_path)
-        summary = summarize_logs(entries)
-        if args.format == "txt":
-            log_report = format_log_report(summary)
-        else:
-            log_report = json.dumps(summary, indent=2)
-        log_report_path = save_report(log_report, output_path)
+        config = AppConfig(
+            input_path=input_path, output_path=output_path, format_type=args.format
+        )
+
+        container = AppContainer(config)
+
+        log_report, saved_path = container.run()
 
         if args.print_report:
             print(log_report)
             print()
 
-        logging.info("Report saved to: %s", log_report_path)
+        logging.info("Report saved to: %s", saved_path)
         return 0
     except (FileNotFoundError, ValueError) as error:
         logging.error("%s", error)

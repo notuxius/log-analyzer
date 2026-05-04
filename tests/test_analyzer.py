@@ -4,16 +4,17 @@ import textwrap
 import pytest
 
 from log_analyzer.analyzer import (
-    format_log_report,
-    load_log_entries,
-    save_report,
-    summarize_logs,
+    LogLoader,
+    LogProcessor,
+    LogSummarizer,
+    ReportSaver,
+    TextFormatter,
 )
 from log_analyzer.main import main
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
-def test_load_log_entries(tmp_path):
+def test_log_loader_loads_valid_entries(tmp_path):
     log_file = tmp_path / "log.txt"
     log_file.write_text(
         "\n".join(
@@ -24,7 +25,9 @@ def test_load_log_entries(tmp_path):
         ),
         encoding="utf-8",
     )
-    entries = load_log_entries(log_file)
+
+    entries = LogLoader(log_file).load()
+
     assert len(entries) == 2
     assert entries[0]["level"] == LogLevel.INFO
     assert entries[1]["level"] == LogLevel.ERROR
@@ -32,22 +35,63 @@ def test_load_log_entries(tmp_path):
     assert entries[1]["message"] == "Something failed"
 
 
-def test_load_log_entries_raises_for_invalid_level(tmp_path):
+def test_log_loader_raises_for_invalid_level(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "2026-04-10 10:01:00 error Something failed",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="Invalid log message level"):
+        LogLoader(log_file).load()
+
+
+def test_log_loader_raises_for_missing_file(tmp_path):
+    missing_file = tmp_path / "missing.txt"
+
+    with pytest.raises(FileNotFoundError, match="doesn't exist"):
+        LogLoader(missing_file).load()
+
+
+def test_log_loader_raises_for_empty_file(tmp_path):
+    log_file = tmp_path / "empty.txt"
+    log_file.write_text("", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Log file cannot be empty"):
+        LogLoader(log_file).load()
+
+
+def test_log_loader_skips_malformed_lines(tmp_path):
     log_file = tmp_path / "log.txt"
     log_file.write_text(
         "\n".join(
             [
+                "malformed line",
                 "2026-04-10 10:00:00 INFO Application started",
-                "2026-04-10 10:01:00 error Something failed",
             ]
         ),
         encoding="utf-8",
     )
-    with pytest.raises(ValueError):
-        load_log_entries(log_file)
+
+    entries = LogLoader(log_file).load()
+
+    assert len(entries) == 1
+    assert entries[0]["message"] == "Application started"
 
 
-def test_summarize_logs():
+def test_log_loader_skips_empty_messages(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "2026-04-10 10:00:00 INFO    ",
+        encoding="utf-8",
+    )
+
+    entries = LogLoader(log_file).load()
+
+    assert entries == []
+
+
+def test_log_summarizer_returns_expected_summary():
     entries: list[LogEntry] = [
         {
             "timestamp": "2026-04-10 10:00:00",
@@ -60,12 +104,14 @@ def test_summarize_logs():
             "message": "Something went wrong",
         },
         {
-            "timestamp": "2026-04-10 10:01:00",
+            "timestamp": "2026-04-10 10:02:00",
             "level": LogLevel.ERROR,
             "message": "Something failed",
         },
     ]
-    summary = summarize_logs(entries)
+
+    summary = LogSummarizer().summarize(entries)
+
     assert summary == {
         "total_lines": 3,
         "info_count": 1,
@@ -75,7 +121,7 @@ def test_summarize_logs():
     }
 
 
-def test_format_log_report():
+def test_text_formatter_returns_expected_report():
     summary: LogSummary = {
         "total_lines": 3,
         "info_count": 1,
@@ -83,7 +129,9 @@ def test_format_log_report():
         "error_count": 1,
         "error_messages": ["Something failed"],
     }
-    report = format_log_report(summary)
+
+    report = TextFormatter().format(summary)
+
     expected = textwrap.dedent("""\
         Total lines: 3
         INFO: 1
@@ -96,27 +144,47 @@ def test_format_log_report():
     assert report == expected
 
 
-def test_save_report(tmp_path):
+def test_report_saver_writes_report(tmp_path):
     output_path = tmp_path / "report.txt"
-    report = textwrap.dedent("""\
-        Total lines: 3
-        INFO: 1
-        WARNING: 1
-        ERROR: 1
-        Error messages:
-        - Something failed
-        """).strip()
+    report = "Total lines: 3"
 
-    result_path = save_report(report, output_path)
-    assert result_path == output_path
+    result_path = ReportSaver(output_path).save(report)
+
+    assert result_path == output_path.resolve()
     assert output_path.read_text(encoding="utf-8") == report
 
 
-def test_save_empty_report_raises_value_error(tmp_path):
+def test_report_saver_raises_for_empty_report(tmp_path):
     output_path = tmp_path / "report.txt"
 
     with pytest.raises(ValueError, match="Report cannot be empty"):
-        save_report("", output_path)
+        ReportSaver(output_path).save("")
+
+
+def test_log_processor_returns_formatted_report(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "\n".join(
+            [
+                "2026-04-10 10:00:00 INFO Application started",
+                "2026-04-10 10:01:00 ERROR Something failed",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    processor = LogProcessor(
+        loader=LogLoader(log_file),
+        summarizer=LogSummarizer(),
+        formatter=TextFormatter(),
+    )
+
+    report = processor.process()
+
+    assert "Total lines: 2" in report
+    assert "INFO: 1" in report
+    assert "ERROR: 1" in report
+    assert "- Something failed" in report
 
 
 def test_main_success(tmp_path, capsys, monkeypatch):
@@ -136,6 +204,7 @@ def test_main_success(tmp_path, capsys, monkeypatch):
         ),
         encoding="utf-8",
     )
+
     monkeypatch.setattr(
         sys,
         "argv",
@@ -150,13 +219,14 @@ def test_main_success(tmp_path, capsys, monkeypatch):
     )
 
     return_code = main()
+
     assert return_code == 0
 
     output_file = tmp_path / "report.txt"
     assert output_file.exists()
 
     captured = capsys.readouterr()
-    report = textwrap.dedent("""\
+    expected_report = textwrap.dedent("""\
         Total lines: 8
         INFO: 4
         WARNING: 2
@@ -165,10 +235,9 @@ def test_main_success(tmp_path, capsys, monkeypatch):
         - Database connection failed
         - Timeout while calling external API
         """).strip()
-    assert captured.out.strip() == report
 
-    content = output_file.read_text(encoding="utf-8")
-    assert content == report
+    assert captured.out.strip() == expected_report
+    assert output_file.read_text(encoding="utf-8") == expected_report
 
 
 def test_main_failure(tmp_path, capsys, caplog, monkeypatch):
@@ -186,57 +255,10 @@ def test_main_failure(tmp_path, capsys, caplog, monkeypatch):
     )
 
     return_code = main()
-    assert return_code == 1
 
-    output_file = tmp_path / "report.txt"
-    assert not output_file.exists()
+    assert return_code == 1
+    assert not (tmp_path / "report.txt").exists()
 
     captured = capsys.readouterr()
     assert captured.out.strip() == ""
-
     assert "doesn't exist" in caplog.text
-
-
-def test_load_log_entries_raises_for_missing_file(tmp_path):
-    missing_file = tmp_path / "missing.txt"
-
-    with pytest.raises(FileNotFoundError, match="doesn't exist"):
-        load_log_entries(missing_file)
-
-
-def test_load_log_entries_raises_for_empty_file(tmp_path):
-    log_file = tmp_path / "empty.txt"
-    log_file.write_text("", encoding="utf-8")
-
-    with pytest.raises(ValueError, match="Log file cannot be empty"):
-        load_log_entries(log_file)
-
-
-def test_load_log_entries_skips_malformed_lines(tmp_path):
-    log_file = tmp_path / "log.txt"
-    log_file.write_text(
-        "\n".join(
-            [
-                "malformed line",
-                "2026-04-10 10:00:00 INFO Application started",
-            ]
-        ),
-        encoding="utf-8",
-    )
-
-    entries = load_log_entries(log_file)
-
-    assert len(entries) == 1
-    assert entries[0]["message"] == "Application started"
-
-
-def test_load_log_entries_skips_empty_messages(tmp_path):
-    log_file = tmp_path / "log.txt"
-    log_file.write_text(
-        "2026-04-10 10:00:00 INFO    ",
-        encoding="utf-8",
-    )
-
-    entries = load_log_entries(log_file)
-
-    assert entries == []
