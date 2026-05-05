@@ -19,26 +19,6 @@ from log_analyzer.main import main
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
-def test_log_loader_skips_blank_lines(tmp_path):
-    log_file = tmp_path / "log.txt"
-    log_file.write_text(
-        "\n".join(
-            [
-                "",
-                "2026-04-10 10:00:00 INFO Application started",
-                "",
-                "2026-04-10 10:01:00 ERROR Something failed",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
-
-    entries = LogLoader(log_file).load()
-
-    assert len(entries) == 2
-
-
 def test_log_loader_loads_valid_entries(tmp_path):
     log_file = tmp_path / "log.txt"
     log_file.write_text(
@@ -69,6 +49,28 @@ def test_log_loader_raises_for_invalid_level(tmp_path):
 
     with pytest.raises(ValueError, match="Invalid log message level"):
         LogLoader(log_file).load()
+
+
+def test_log_loader_skips_blank_lines(tmp_path):
+    log_file = tmp_path / "log.txt"
+    log_file.write_text(
+        "\n".join(
+            [
+                "",
+                "2026-04-10 10:00:00 INFO Application started",
+                "",
+                "2026-04-10 10:01:00 ERROR Something failed",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    entries = LogLoader(log_file).load()
+
+    assert len(entries) == 2
+    assert entries[0]["message"] == "Application started"
+    assert entries[1]["message"] == "Something failed"
 
 
 def test_log_loader_raises_for_missing_file(tmp_path):

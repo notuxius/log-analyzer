@@ -9,7 +9,6 @@ from log_analyzer.analyzer import (
     ReportSaver,
     Saver,
 )
-
 from log_analyzer.config import AppConfig
 
 

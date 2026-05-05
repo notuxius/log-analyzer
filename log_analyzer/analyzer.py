@@ -1,4 +1,5 @@
 import json
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Protocol
 
@@ -25,14 +26,13 @@ class LogLoader:
     def __init__(self, log_file: str | Path) -> None:
         self.log_file = Path(log_file)
 
-    def _read_lines(self) -> list[str]:
+    def _read_lines(self) -> Iterable[str]:
         if not self.log_file.exists():
             raise FileNotFoundError(f"Log file {self.log_file} doesn't exist.")
 
-        lines = self.log_file.read_text(encoding="utf-8").splitlines()
-        if not any(line.strip() for line in lines):
-            raise ValueError("Log file cannot be empty.")
-        return lines
+        with self.log_file.open(encoding="utf-8") as file:
+            for line in file:
+                yield line.rstrip("\n")
 
     def _parse_line(self, line: str) -> LogEntry | None:
         parts = line.split(" ", 3)
@@ -64,17 +64,22 @@ class LogLoader:
         return log_entry
 
     def load(self) -> list[LogEntry]:
-        lines = self._read_lines()
         log_entries: list[LogEntry] = []
+        has_content = False
 
-        for line in lines:
-            if not line.strip():
+        for line in self._read_lines():
+            if line.strip():
+                has_content = True
+            else:
                 continue
 
             log_entry = self._parse_line(line)
 
             if log_entry is not None:
                 log_entries.append(log_entry)
+
+        if not has_content:
+            raise ValueError("Log file cannot be empty.")
 
         return log_entries
 

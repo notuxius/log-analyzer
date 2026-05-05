@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+
 from log_analyzer.analyzer import FormatterFactory
 
 

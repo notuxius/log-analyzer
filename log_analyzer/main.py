@@ -1,6 +1,4 @@
 import argparse
-import logging
-from pathlib import Path
 
 from log_analyzer.config import AppConfig
 from log_analyzer.container import AppContainer
@@ -8,14 +6,6 @@ from log_analyzer.logger import AppLogger
 
 APP_NAME = "log-analyzer"
 __version__ = "1.0.0"
-
-
-def configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s.%(msecs)03d | %(levelname)s | %(message)s",
-        datefmt="%d-%m-%Y %H:%M:%S",
-    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -37,6 +27,13 @@ def parse_args() -> argparse.Namespace:
         help="Output format: text or json.",
     )
     parser.add_argument(
+        "--log-level",
+        default="INFO",
+        type=str.upper,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level.",
+    )
+    parser.add_argument(
         "--print-report",
         action="store_true",
         help="Print report to console.",
@@ -50,12 +47,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    configure_logging()
-    logger = AppLogger()
+    args = parse_args()
+    logger = AppLogger(args.log_level)
 
     try:
-        args = parse_args()
-
         config = AppConfig(
             input_path=args.input, output_path=args.output, format_type=args.format
         )

@@ -1,4 +1,4 @@
-from log_analyzer.analyzer import LogEntry, LogSummary, LogProcessor, LogSummarizer
+from log_analyzer.analyzer import LogEntry, LogProcessor, LogSummarizer, LogSummary
 from log_analyzer.models import LogLevel
 
 
