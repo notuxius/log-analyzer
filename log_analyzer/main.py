@@ -4,6 +4,7 @@ from pathlib import Path
 
 from log_analyzer.config import AppConfig
 from log_analyzer.container import AppContainer
+from log_analyzer.logger import AppLogger
 
 APP_NAME = "log-analyzer"
 __version__ = "1.0.0"
@@ -50,6 +51,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     configure_logging()
+    logger = AppLogger()
 
     try:
         args = parse_args()
@@ -66,10 +68,10 @@ def main() -> int:
             print(log_report)
             print()
 
-        logging.info("Report saved to: %s", saved_path)
+        logger.info("Report saved to: %s", saved_path)
         return 0
     except (FileNotFoundError, ValueError) as error:
-        logging.error("%s", error)
+        logger.error("%s", error)
         return 1
 
 
