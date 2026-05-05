@@ -53,14 +53,9 @@ def main() -> int:
 
     try:
         args = parse_args()
-        input_path = Path(args.input)
-        output_path = Path(args.output)
-
-        if not output_path.suffix:
-            output_path = output_path.with_suffix(f".{args.format}")
 
         config = AppConfig(
-            input_path=input_path, output_path=output_path, format_type=args.format
+            input_path=args.input, output_path=args.output, format_type=args.format
         )
 
         container = AppContainer(config)
