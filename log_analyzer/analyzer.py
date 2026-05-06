@@ -3,6 +3,13 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Protocol
 
+from log_analyzer.exceptions import (
+    EmptyLogFileError,
+    EmptyReportError,
+    InvalidLogLevelError,
+    LogFileNotFoundError,
+    UnsupportedFormatError,
+)
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
@@ -28,7 +35,7 @@ class LogLoader:
 
     def _read_lines(self) -> Iterable[str]:
         if not self.log_file.exists():
-            raise FileNotFoundError(f"Log file {self.log_file} doesn't exist.")
+            raise LogFileNotFoundError(f"Log file {self.log_file} doesn't exist.")
 
         with self.log_file.open(encoding="utf-8") as file:
             for line in file:
@@ -49,7 +56,9 @@ class LogLoader:
             level = LogLevel(level_part)
 
         except ValueError as error:
-            raise ValueError(f"Invalid log message level: {level_part}") from error
+            raise InvalidLogLevelError(
+                f"Invalid log message level: {level_part}"
+            ) from error
 
         if not message_part.strip():
             # logging.warning("Skipped empty log message: %s", message_part)
@@ -79,7 +88,7 @@ class LogLoader:
                 log_entries.append(log_entry)
 
         if not has_content:
-            raise ValueError("Log file cannot be empty.")
+            raise EmptyLogFileError("Log file cannot be empty.")
 
         return log_entries
 
@@ -163,7 +172,9 @@ class FormatterFactory:
         try:
             formatter_class = FormatterFactory.FORMATTERS[format_type]
         except KeyError as error:
-            raise ValueError(f"Unsupported format: {format_type}") from error
+            raise UnsupportedFormatError(
+                f"Unsupported format: {format_type}"
+            ) from error
 
         return formatter_class()
 
@@ -174,7 +185,7 @@ class ReportSaver:
 
     def save(self, report: str) -> Path:
         if not report.strip():
-            raise ValueError("Report cannot be empty.")
+            raise EmptyReportError("Report cannot be empty.")
 
         path = self.file_path.resolve()
         path.parent.mkdir(parents=True, exist_ok=True)

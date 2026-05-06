@@ -17,6 +17,13 @@ from log_analyzer.analyzer import (
 )
 from log_analyzer.config import AppConfig
 from log_analyzer.container import AppContainer
+from log_analyzer.exceptions import (
+    EmptyLogFileError,
+    EmptyReportError,
+    InvalidLogLevelError,
+    LogFileNotFoundError,
+    UnsupportedFormatError,
+)
 from log_analyzer.main import main
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
@@ -77,7 +84,7 @@ def test_log_loader_raises_for_invalid_level(tmp_path):
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match="Invalid log message level"):
+    with pytest.raises(InvalidLogLevelError, match="Invalid log message level"):
         LogLoader(log_file).load()
 
 
@@ -106,7 +113,7 @@ def test_log_loader_skips_blank_lines(tmp_path):
 def test_log_loader_raises_for_missing_file(tmp_path):
     missing_file = tmp_path / "missing.txt"
 
-    with pytest.raises(FileNotFoundError, match="doesn't exist"):
+    with pytest.raises(LogFileNotFoundError, match="doesn't exist"):
         LogLoader(missing_file).load()
 
 
@@ -114,7 +121,7 @@ def test_log_loader_raises_for_empty_file(tmp_path):
     log_file = tmp_path / "empty.txt"
     log_file.write_text("", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="Log file cannot be empty"):
+    with pytest.raises(EmptyLogFileError, match="Log file cannot be empty"):
         LogLoader(log_file).load()
 
 
@@ -242,7 +249,7 @@ def test_formatter_factory_returns_json_formatter():
 
 
 def test_formatter_factory_raises_for_unsupported_format():
-    with pytest.raises(ValueError, match="Unsupported format"):
+    with pytest.raises(UnsupportedFormatError, match="Unsupported format"):
         FormatterFactory.create("xml")
 
 
@@ -259,7 +266,7 @@ def test_report_saver_writes_report(tmp_path):
 def test_report_saver_raises_for_empty_report(tmp_path):
     output_path = tmp_path / "report.txt"
 
-    with pytest.raises(ValueError, match="Report cannot be empty"):
+    with pytest.raises(EmptyReportError, match="Report cannot be empty"):
         ReportSaver(output_path).save("")
 
 

@@ -2,6 +2,7 @@ import argparse
 
 from log_analyzer.config import AppConfig
 from log_analyzer.container import AppContainer
+from log_analyzer.exceptions import LogAnalyzerError
 from log_analyzer.logger import AppLogger
 
 APP_NAME = "log-analyzer"
@@ -65,7 +66,7 @@ def main() -> int:
 
         logger.info("Report saved to: %s", saved_path)
         return 0
-    except (FileNotFoundError, ValueError) as error:
+    except LogAnalyzerError as error:
         logger.error("%s", error)
         return 1
 
