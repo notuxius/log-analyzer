@@ -1,0 +1,27 @@
+import pytest
+
+from log_analyzer.analyzer import (
+    FormatterFactory,
+    JsonFormatter,
+    TextFormatter,
+)
+from log_analyzer.exceptions import (
+    UnsupportedFormatError,
+)
+
+
+def test_formatter_factory_returns_text_formatter():
+    formatter = FormatterFactory.create("txt")
+
+    assert isinstance(formatter, TextFormatter)
+
+
+def test_formatter_factory_returns_json_formatter():
+    formatter = FormatterFactory.create("json")
+
+    assert isinstance(formatter, JsonFormatter)
+
+
+def test_formatter_factory_raises_for_unsupported_format():
+    with pytest.raises(UnsupportedFormatError, match="Unsupported format"):
+        FormatterFactory.create("xml")
