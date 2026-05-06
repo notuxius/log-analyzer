@@ -68,7 +68,7 @@ def test_log_loader_loads_valid_entries(tmp_path):
         encoding="utf-8",
     )
 
-    entries = LogLoader(log_file).load()
+    entries = list(LogLoader(log_file).load())
 
     assert len(entries) == 2
     assert entries[0]["level"] == LogLevel.INFO
@@ -85,7 +85,7 @@ def test_log_loader_raises_for_invalid_level(tmp_path):
     )
 
     with pytest.raises(InvalidLogLevelError, match="Invalid log message level"):
-        LogLoader(log_file).load()
+        list(LogLoader(log_file).load())
 
 
 def test_log_loader_skips_blank_lines(tmp_path):
@@ -103,7 +103,7 @@ def test_log_loader_skips_blank_lines(tmp_path):
         encoding="utf-8",
     )
 
-    entries = LogLoader(log_file).load()
+    entries = list(LogLoader(log_file).load())
 
     assert len(entries) == 2
     assert entries[0]["message"] == "Application started"
@@ -114,7 +114,7 @@ def test_log_loader_raises_for_missing_file(tmp_path):
     missing_file = tmp_path / "missing.txt"
 
     with pytest.raises(LogFileNotFoundError, match="doesn't exist"):
-        LogLoader(missing_file).load()
+        list(LogLoader(missing_file).load())
 
 
 def test_log_loader_raises_for_empty_file(tmp_path):
@@ -122,7 +122,7 @@ def test_log_loader_raises_for_empty_file(tmp_path):
     log_file.write_text("", encoding="utf-8")
 
     with pytest.raises(EmptyLogFileError, match="Log file cannot be empty"):
-        LogLoader(log_file).load()
+        list(LogLoader(log_file).load())
 
 
 def test_log_loader_skips_malformed_lines(tmp_path):
@@ -137,7 +137,7 @@ def test_log_loader_skips_malformed_lines(tmp_path):
         encoding="utf-8",
     )
 
-    entries = LogLoader(log_file).load()
+    entries = list(LogLoader(log_file).load())
 
     assert len(entries) == 1
     assert entries[0]["message"] == "Application started"
@@ -150,7 +150,7 @@ def test_log_loader_skips_empty_messages(tmp_path):
         encoding="utf-8",
     )
 
-    entries = LogLoader(log_file).load()
+    entries = list(LogLoader(log_file).load())
 
     assert entries == []
 

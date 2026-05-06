@@ -14,11 +14,11 @@ from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
 class Loader(Protocol):
-    def load(self) -> list[LogEntry]: ...
+    def load(self) -> Iterable[LogEntry]: ...
 
 
 class Summarizer(Protocol):
-    def summarize(self, entries: list[LogEntry]) -> LogSummary: ...
+    def summarize(self, entries: Iterable[LogEntry]) -> LogSummary: ...
 
 
 class Formatter(Protocol):
@@ -72,8 +72,7 @@ class LogLoader:
 
         return log_entry
 
-    def load(self) -> list[LogEntry]:
-        log_entries: list[LogEntry] = []
+    def load(self) -> Iterable[LogEntry]:
         has_content = False
 
         for line in self._read_lines():
@@ -85,33 +84,35 @@ class LogLoader:
             log_entry = self._parse_line(line)
 
             if log_entry is not None:
-                log_entries.append(log_entry)
+                yield log_entry
 
         if not has_content:
             raise EmptyLogFileError("Log file cannot be empty.")
 
-        return log_entries
-
 
 class LogSummarizer:
-    def summarize(self, entries: list[LogEntry]) -> LogSummary:
+    def summarize(self, entries: Iterable[LogEntry]) -> LogSummary:
+        total_lines = 0
         info_count = 0
         warning_count = 0
         error_count = 0
         error_messages: list[str] = []
 
         for log_entry in entries:
+            total_lines += 1
             log_entry_level = log_entry["level"]
-            if log_entry_level == LogLevel.INFO:
-                info_count += 1
-            elif log_entry_level == LogLevel.WARNING:
-                warning_count += 1
-            elif log_entry_level == LogLevel.ERROR:
-                error_count += 1
-                error_messages.append(log_entry["message"])
+
+            match log_entry_level:
+                case LogLevel.INFO:
+                    info_count += 1
+                case LogLevel.WARNING:
+                    warning_count += 1
+                case LogLevel.ERROR:
+                    error_count += 1
+                    error_messages.append(log_entry["message"])
 
         log_summary: LogSummary = {
-            "total_lines": len(entries),
+            "total_lines": total_lines,
             "info_count": info_count,
             "warning_count": warning_count,
             "error_count": error_count,
