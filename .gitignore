@@ -18,6 +18,10 @@ dist/
 coverage.xml
 htmlcov/
 
+# Tool caches
+.ruff_cache/
+.pytest_cache/
+
 # IDE
 .vscode/
 .idea/
