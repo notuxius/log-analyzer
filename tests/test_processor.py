@@ -1,33 +1,11 @@
 from log_analyzer.analyzer import (
-    LogEntry,
     LogLoader,
     LogProcessor,
     LogSummarizer,
-    LogSummary,
     TextFormatter,
 )
-from log_analyzer.models import LogLevel
-
-
-class FakeLoader:
-    def load(self) -> list[LogEntry]:
-        return [
-            {
-                "timestamp": "2026-04-10 10:00:00",
-                "level": LogLevel.INFO,
-                "message": "Application started",
-            },
-            {
-                "timestamp": "2026-04-10 10:01:00",
-                "level": LogLevel.ERROR,
-                "message": "Something failed",
-            },
-        ]
-
-
-class FakeFormatter:
-    def format(self, summary: LogSummary) -> str:
-        return "FAKE REPORT"
+from tests.fakes.fake_formatter import FakeFormatter
+from tests.fakes.fake_loader import FakeLoader
 
 
 def test_log_processor_with_fakes() -> None:
@@ -38,7 +16,7 @@ def test_log_processor_with_fakes() -> None:
     )
 
     result = processor.process()
-    assert result == "FAKE REPORT"
+    assert result == "Processed 1 entries"
 
 
 def test_log_processor_returns_formatted_report(tmp_path):
