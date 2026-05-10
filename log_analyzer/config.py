@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,6 +12,19 @@ class AppConfig:
     input_path: Path
     output_path: Path
     format_type: str
+
+    @classmethod
+    def create(
+        cls,
+        input_path: Path | str,
+        output_path: Path | str,
+        format_type: str,
+    ) -> AppConfig:
+        return cls(
+            input_path=Path(input_path),
+            output_path=Path(output_path),
+            format_type=format_type,
+        )
 
     def __post_init__(self) -> None:
         self.input_path = Path(self.input_path)

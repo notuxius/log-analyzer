@@ -18,7 +18,7 @@ def test_app_container_runs_pipeline(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    config = AppConfig(
+    config = AppConfig.create(
         input_path=input_path,
         output_path=output_path,
         format_type="txt",

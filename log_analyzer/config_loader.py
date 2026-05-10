@@ -15,7 +15,7 @@ class ConfigLoader:
 
         data = json.loads(self.config_path.read_text(encoding="utf-8"))
 
-        return AppConfig(
+        return AppConfig.create(
             input_path=data["input_path"],
             output_path=data["output_path"],
             format_type=data["format_type"],
