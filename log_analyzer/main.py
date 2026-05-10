@@ -1,6 +1,7 @@
 import argparse
 
 from log_analyzer.config import AppConfig
+from log_analyzer.config_loader import ConfigLoader
 from log_analyzer.container import AppContainer
 from log_analyzer.exceptions import LogAnalyzerError
 from log_analyzer.logger import AppLogger
@@ -11,6 +12,10 @@ __version__ = "1.0.0"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Analyze logs and generate a report.")
+    parser.add_argument(
+        "--config",
+        help="Path to JSON config file.",
+    )
     parser.add_argument(
         "--input",
         default="logs/sample.txt",
@@ -52,9 +57,12 @@ def main() -> int:
     logger = AppLogger(args.log_level)
 
     try:
-        config = AppConfig(
-            input_path=args.input, output_path=args.output, format_type=args.format
-        )
+        if args.config:
+            config = ConfigLoader(args.config).load()
+        else:
+            config = AppConfig.create(
+                input_path=args.input, output_path=args.output, format_type=args.format
+            )
 
         container = AppContainer(config)
 

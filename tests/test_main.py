@@ -94,6 +94,43 @@ def test_main_success_json_format(tmp_path, monkeypatch):
     assert content["error_messages"] == ["Something failed"]
 
 
+def test_main_success_with_config_file(tmp_path, monkeypatch):
+    log_file = tmp_path / "log.txt"
+    output_file = tmp_path / "report.txt"
+    config_file = tmp_path / "config.json"
+
+    log_file.write_text(
+        "2026-04-10 10:00:00 ERROR Something failed",
+        encoding="utf-8",
+    )
+
+    config_file.write_text(
+        json.dumps(
+            {
+                "input_path": str(log_file),
+                "output_path": str(output_file),
+                "format_type": "txt",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "log-analyzer",
+            "--config",
+            str(config_file),
+        ],
+    )
+
+    return_code = main()
+
+    assert return_code == 0
+    assert output_file.exists()
+    assert "ERROR: 1" in output_file.read_text(encoding="utf-8")
+
+
 def test_main_returns_error_for_missing_input_file(
     tmp_path, capsys, caplog, monkeypatch
 ):

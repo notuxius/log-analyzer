@@ -27,8 +27,6 @@ class AppConfig:
         )
 
     def __post_init__(self) -> None:
-        self.input_path = Path(self.input_path)
-        self.output_path = Path(self.output_path)
         self.format_type = self.format_type.lower()
 
         if self.format_type not in FormatterFactory.FORMATTERS:
