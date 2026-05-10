@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from log_analyzer.config import AppConfig
+from log_analyzer.exceptions import UnsupportedFormatError
 
 
 def test_app_config_raises_for_unsupported_format(tmp_path: Path) -> None:
@@ -17,7 +18,7 @@ def test_app_config_raises_for_unsupported_format(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    with pytest.raises(ValueError, match="Unsupported format: xml"):
+    with pytest.raises(UnsupportedFormatError, match="Unsupported format: xml"):
         AppConfig(
             input_path=input_path,
             output_path=output_path,
