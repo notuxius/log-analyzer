@@ -1,5 +1,5 @@
 import json
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Protocol
 
@@ -10,11 +10,12 @@ from log_analyzer.exceptions import (
     LogFileNotFoundError,
     UnsupportedFormatError,
 )
+from log_analyzer.logger import AppLogger
 from log_analyzer.models import LogEntry, LogLevel, LogSummary
 
 
 class Loader(Protocol):
-    def load(self) -> Iterable[LogEntry]: ...
+    def load(self) -> Iterator[LogEntry]: ...
 
 
 class Summarizer(Protocol):
@@ -30,10 +31,11 @@ class Saver(Protocol):
 
 
 class LogLoader:
-    def __init__(self, log_file: str | Path) -> None:
+    def __init__(self, log_file: str | Path, logger: AppLogger | None = None) -> None:
         self.log_file = Path(log_file)
+        self.logger = logger or AppLogger()
 
-    def _read_lines(self) -> Iterable[str]:
+    def _read_lines(self) -> Iterator[str]:
         if not self.log_file.exists():
             raise LogFileNotFoundError(f"Log file {self.log_file} doesn't exist.")
 
@@ -45,7 +47,7 @@ class LogLoader:
         parts = line.split(" ", 3)
 
         if len(parts) != 4:
-            # logging.warning("Skipped malformed log message: %s", line)
+            self.logger.warning("Skipped malformed log message: %s", line)
             return None
 
         date_part, time_part, level_part, message_part = parts
@@ -61,7 +63,7 @@ class LogLoader:
             ) from error
 
         if not message_part.strip():
-            # logging.warning("Skipped empty log message: %s", message_part)
+            self.logger.warning("Skipped empty log message.")
             return None
 
         log_entry: LogEntry = {
@@ -72,7 +74,7 @@ class LogLoader:
 
         return log_entry
 
-    def load(self) -> Iterable[LogEntry]:
+    def load(self) -> Iterator[LogEntry]:
         has_content = False
 
         for line in self._read_lines():
@@ -156,8 +158,8 @@ class LogProcessor:
         self.formatter = formatter
 
     def process(self) -> str:
-        loaded = self.loader.load()
-        summary = self.summarizer.summarize(loaded)
+        entries = self.loader.load()
+        summary = self.summarizer.summarize(entries)
         return self.formatter.format(summary)
 
 
