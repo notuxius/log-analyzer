@@ -1,5 +1,7 @@
 import logging
 
+from log_analyzer.constants import APP_NAME
+
 
 class AppLogger:
     def __init__(self, level: str = "INFO") -> None:
@@ -9,12 +11,16 @@ class AppLogger:
             datefmt="%d-%m-%Y %H:%M:%S",
             force=True,
         )
+        self.logger = logging.getLogger(APP_NAME)
 
     def debug(self, message: str, *args: object) -> None:
-        logging.debug(message, *args)
+        self.logger.debug(message, *args)
 
     def info(self, message: str, *args: object) -> None:
-        logging.info(message, *args)
+        self.logger.info(message, *args)
+
+    def warning(self, message: str, *args: object) -> None:
+        self.logger.warning(message, *args)
 
     def error(self, message: str, *args: object) -> None:
-        logging.error(message, *args)
+        self.logger.error(message, *args)
