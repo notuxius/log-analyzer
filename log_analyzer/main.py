@@ -2,12 +2,10 @@ import argparse
 
 from log_analyzer.config import AppConfig
 from log_analyzer.config_loader import ConfigLoader
+from log_analyzer.constants import APP_NAME, APP_VERSION
 from log_analyzer.container import AppContainer
 from log_analyzer.exceptions import LogAnalyzerError
 from log_analyzer.logger import AppLogger
-
-APP_NAME = "log-analyzer"
-__version__ = "1.0.0"
 
 
 def parse_args() -> argparse.Namespace:
@@ -57,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--version",
         action="version",
-        version=f"{APP_NAME} {__version__}",
+        version=f"{APP_NAME} {APP_VERSION}",
     )
     return parser.parse_args()
 
