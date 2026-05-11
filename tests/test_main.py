@@ -159,9 +159,35 @@ def test_main_quiet_suppresses_info_logs(tmp_path, caplog, monkeypatch):
     assert "Report saved to" not in caplog.text
 
 
-def test_main_returns_error_for_missing_input_file(
-    tmp_path, capsys, caplog, monkeypatch
-):
+def test_main_debug_shows_debug_logs(tmp_path, capsys, monkeypatch):
+    log_file = tmp_path / "log.txt"
+
+    log_file.write_text(
+        "2026-04-10 10:00:00 INFO Application started",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "log-analyzer",
+            "--input",
+            str(log_file),
+            "--output",
+            str(tmp_path / "report"),
+            "--verbose",
+        ],
+    )
+
+    return_code = main()
+    captured = capsys.readouterr()
+
+    assert return_code == 0
+    assert "Starting log analysis" in captured.err
+
+
+def test_main_returns_error_for_missing_input_file(tmp_path, capsys, monkeypatch):
     monkeypatch.setattr(
         sys,
         "argv",
@@ -176,10 +202,9 @@ def test_main_returns_error_for_missing_input_file(
     )
 
     return_code = main()
+    captured = capsys.readouterr()
 
     assert return_code == 1
     assert not (tmp_path / "report.txt").exists()
-
-    captured = capsys.readouterr()
     assert captured.out.strip() == ""
-    assert "doesn't exist" in caplog.text
+    assert "doesn't exist" in captured.err

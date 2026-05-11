@@ -45,6 +45,11 @@ def parse_args() -> argparse.Namespace:
         help="Suppress informational logs.",
     )
     parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose debug logging.",
+    )
+    parser.add_argument(
         "--print-report",
         action="store_true",
         help="Print report to console.",
@@ -59,8 +64,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    log_level = "ERROR" if args.quiet else args.log_level
+    if args.quiet:
+        log_level = "ERROR"
+    elif args.verbose:
+        log_level = "DEBUG"
+    else:
+        log_level = args.log_level
+
     logger = AppLogger(log_level)
+    logger.debug("Starting log analysis")
 
     try:
         if args.config:

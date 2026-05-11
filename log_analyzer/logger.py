@@ -7,7 +7,11 @@ class AppLogger:
             level=getattr(logging, level.upper(), logging.INFO),
             format="%(asctime)s.%(msecs)03d | %(levelname)s | %(message)s",
             datefmt="%d-%m-%Y %H:%M:%S",
+            force=True,
         )
+
+    def debug(self, message: str, *args: object) -> None:
+        logging.debug(message, *args)
 
     def info(self, message: str, *args: object) -> None:
         logging.info(message, *args)
