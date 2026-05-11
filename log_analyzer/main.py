@@ -40,6 +40,11 @@ def parse_args() -> argparse.Namespace:
         help="Logging level.",
     )
     parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress informational logs.",
+    )
+    parser.add_argument(
         "--print-report",
         action="store_true",
         help="Print report to console.",
@@ -54,7 +59,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    logger = AppLogger(args.log_level)
+    log_level = "ERROR" if args.quiet else args.log_level
+    logger = AppLogger(log_level)
 
     try:
         if args.config:

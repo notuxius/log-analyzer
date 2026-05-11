@@ -116,7 +116,8 @@ def test_main_success_with_config_file(tmp_path, monkeypatch):
     )
 
     monkeypatch.setattr(
-        "sys.argv",
+        sys,
+        "argv",
         [
             "log-analyzer",
             "--config",
@@ -129,6 +130,33 @@ def test_main_success_with_config_file(tmp_path, monkeypatch):
     assert return_code == 0
     assert output_file.exists()
     assert "ERROR: 1" in output_file.read_text(encoding="utf-8")
+
+
+def test_main_quiet_suppresses_info_logs(tmp_path, caplog, monkeypatch):
+    log_file = tmp_path / "log.txt"
+
+    log_file.write_text(
+        "2026-04-10 10:00:00 INFO Application started",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "log-analyzer",
+            "--input",
+            str(log_file),
+            "--output",
+            str(tmp_path / "report"),
+            "--quiet",
+        ],
+    )
+
+    return_code = main()
+
+    assert return_code == 0
+    assert "Report saved to" not in caplog.text
 
 
 def test_main_returns_error_for_missing_input_file(
