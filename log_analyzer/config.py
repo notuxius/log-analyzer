@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from log_analyzer.exceptions import UnsupportedFormatError
-from log_analyzer.formatters import FormatterFactory
+from log_analyzer.formatter import FormatterFactory
 
 
 @dataclass

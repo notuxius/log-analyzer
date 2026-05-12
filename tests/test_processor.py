@@ -1,4 +1,4 @@
-from log_analyzer.formatters import TextFormatter
+from log_analyzer.formatter import TextFormatter
 from log_analyzer.loader import LogLoader
 from log_analyzer.processor import LogProcessor
 from log_analyzer.summarizer import LogSummarizer

@@ -3,7 +3,7 @@ import pytest
 from log_analyzer.exceptions import (
     UnsupportedFormatError,
 )
-from log_analyzer.formatters import (
+from log_analyzer.formatter import (
     FormatterFactory,
     JsonFormatter,
     TextFormatter,

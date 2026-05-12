@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from log_analyzer.config import AppConfig
-from log_analyzer.formatters import FormatterFactory
+from log_analyzer.formatter import FormatterFactory
 from log_analyzer.loader import LogLoader
 from log_analyzer.processor import LogProcessor
 from log_analyzer.protocols import Formatter, Saver
