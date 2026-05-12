@@ -3,17 +3,18 @@ from pathlib import Path
 
 from log_analyzer.exceptions import (
     EmptyLogFileError,
-    InvalidLogLevelError,
     LogFileNotFoundError,
 )
 from log_analyzer.logger import AppLogger
-from log_analyzer.models import LogEntry, LogLevel
+from log_analyzer.models import LogEntry
+from log_analyzer.parser import LogParser
 
 
 class LogLoader:
     def __init__(self, log_file: str | Path, logger: AppLogger | None = None) -> None:
         self.log_file = Path(log_file)
         self.logger = logger or AppLogger()
+        self.parser = LogParser()
 
     def _read_lines(self) -> Iterator[str]:
         if not self.log_file.exists():
@@ -24,33 +25,11 @@ class LogLoader:
                 yield line.rstrip("\n")
 
     def _parse_line(self, line: str) -> LogEntry | None:
-        parts = line.split(" ", 3)
+        log_entry = self.parser.parse(line)
 
-        if len(parts) != 4:
-            self.logger.warning("Skipped malformed log message: %s", line)
+        if log_entry is None:
+            self.logger.warning("Skipped malformed or empty log message: %s", line)
             return None
-
-        date_part, time_part, level_part, message_part = parts
-
-        timestamp = f"{date_part} {time_part}"
-
-        try:
-            level = LogLevel(level_part)
-
-        except ValueError as error:
-            raise InvalidLogLevelError(
-                f"Invalid log message level: {level_part}"
-            ) from error
-
-        if not message_part.strip():
-            self.logger.warning("Skipped empty log message.")
-            return None
-
-        log_entry: LogEntry = {
-            "timestamp": timestamp,
-            "level": level,
-            "message": message_part,
-        }
 
         return log_entry
 
