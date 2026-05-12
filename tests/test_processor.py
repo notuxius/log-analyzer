@@ -1,9 +1,7 @@
-from log_analyzer.analyzer import (
-    LogLoader,
-    LogProcessor,
-    LogSummarizer,
-    TextFormatter,
-)
+from log_analyzer.formatters import TextFormatter
+from log_analyzer.loader import LogLoader
+from log_analyzer.processor import LogProcessor
+from log_analyzer.summarizer import LogSummarizer
 from tests.fakes.fake_formatter import FakeFormatter
 from tests.fakes.fake_loader import FakeLoader
 

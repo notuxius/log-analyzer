@@ -2,12 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from log_analyzer.analyzer import LogLoader
 from log_analyzer.exceptions import (
     EmptyLogFileError,
     InvalidLogLevelError,
     LogFileNotFoundError,
 )
+from log_analyzer.loader import LogLoader
 from log_analyzer.models import LogLevel
 
 

@@ -1,7 +1,7 @@
 import json
 import textwrap
 
-from log_analyzer.analyzer import (
+from log_analyzer.formatters import (
     JsonFormatter,
     TextFormatter,
 )

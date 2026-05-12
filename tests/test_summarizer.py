@@ -1,7 +1,7 @@
-from log_analyzer.analyzer import (
+from log_analyzer.models import LogEntry, LogLevel
+from log_analyzer.summarizer import (
     LogSummarizer,
 )
-from log_analyzer.models import LogEntry, LogLevel
 
 
 def test_log_summarizer_returns_expected_summary():

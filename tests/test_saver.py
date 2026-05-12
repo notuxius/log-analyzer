@@ -1,10 +1,10 @@
 import pytest
 
-from log_analyzer.analyzer import (
-    ReportSaver,
-)
 from log_analyzer.exceptions import (
     EmptyReportError,
+)
+from log_analyzer.saver import (
+    ReportSaver,
 )
 
 

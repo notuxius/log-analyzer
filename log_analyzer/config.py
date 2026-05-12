@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from log_analyzer.analyzer import FormatterFactory
 from log_analyzer.exceptions import UnsupportedFormatError
+from log_analyzer.formatters import FormatterFactory
 
 
 @dataclass

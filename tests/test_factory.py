@@ -1,12 +1,12 @@
 import pytest
 
-from log_analyzer.analyzer import (
+from log_analyzer.exceptions import (
+    UnsupportedFormatError,
+)
+from log_analyzer.formatters import (
     FormatterFactory,
     JsonFormatter,
     TextFormatter,
-)
-from log_analyzer.exceptions import (
-    UnsupportedFormatError,
 )
 
 
