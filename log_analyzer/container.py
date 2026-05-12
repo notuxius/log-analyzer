@@ -1,15 +1,14 @@
 from pathlib import Path
 
 from log_analyzer.analyzer import (
-    Formatter,
     FormatterFactory,
     LogLoader,
     LogProcessor,
     LogSummarizer,
     ReportSaver,
-    Saver,
 )
 from log_analyzer.config import AppConfig
+from log_analyzer.protocols import Formatter, Saver
 
 
 class AppContainer:
