@@ -34,10 +34,10 @@ class LogParser:
         if not message_part.strip():
             return None
 
-        log_entry: LogEntry = {
-            "timestamp": timestamp,
-            "level": level,
-            "message": message_part,
-        }
+        log_entry = LogEntry(
+            timestamp=timestamp,
+            level=level,
+            message=message_part,
+        )
 
         return log_entry

@@ -13,7 +13,7 @@ class LogSummarizer:
 
         for log_entry in entries:
             total_lines += 1
-            log_entry_level = log_entry["level"]
+            log_entry_level = log_entry.level
 
             match log_entry_level:
                 case LogLevel.INFO:
@@ -22,7 +22,7 @@ class LogSummarizer:
                     warning_count += 1
                 case LogLevel.ERROR:
                     error_count += 1
-                    error_messages.append(log_entry["message"])
+                    error_messages.append(log_entry.message)
 
         log_summary: LogSummary = {
             "total_lines": total_lines,

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import TypedDict
 
@@ -8,7 +9,8 @@ class LogLevel(StrEnum):
     ERROR = "ERROR"
 
 
-class LogEntry(TypedDict):
+@dataclass(frozen=True)
+class LogEntry:
     timestamp: str
     level: LogLevel
     message: str

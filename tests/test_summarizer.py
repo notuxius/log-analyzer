@@ -6,21 +6,21 @@ from log_analyzer.summarizer import (
 
 def test_log_summarizer_returns_expected_summary():
     entries: list[LogEntry] = [
-        {
-            "timestamp": "2026-04-10 10:00:00",
-            "level": LogLevel.INFO,
-            "message": "Application started",
-        },
-        {
-            "timestamp": "2026-04-10 10:01:00",
-            "level": LogLevel.WARNING,
-            "message": "Something went wrong",
-        },
-        {
-            "timestamp": "2026-04-10 10:02:00",
-            "level": LogLevel.ERROR,
-            "message": "Something failed",
-        },
+        LogEntry(
+            timestamp="2026-04-10 10:00:00",
+            level=LogLevel.INFO,
+            message="Application started",
+        ),
+        LogEntry(
+            timestamp="2026-04-10 10:01:00",
+            level=LogLevel.WARNING,
+            message="Something went wrong",
+        ),
+        LogEntry(
+            timestamp="2026-04-10 10:02:00",
+            level=LogLevel.ERROR,
+            message="Something failed",
+        ),
     ]
 
     summary = LogSummarizer().summarize(entries)

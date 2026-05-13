@@ -11,9 +11,9 @@ def test_log_parser_parses_valid_info_entry() -> None:
     entry = LogParser().parse(line)
 
     assert entry is not None
-    assert entry["timestamp"] == "2026-04-10 10:00:00"
-    assert entry["level"] == LogLevel.INFO
-    assert entry["message"] == "Application started"
+    assert entry.timestamp == "2026-04-10 10:00:00"
+    assert entry.level == LogLevel.INFO
+    assert entry.message == "Application started"
 
 
 def test_log_parser_parses_valid_error_entry() -> None:
@@ -22,9 +22,9 @@ def test_log_parser_parses_valid_error_entry() -> None:
     entry = LogParser().parse(line)
 
     assert entry is not None
-    assert entry["timestamp"] == "2026-04-10 10:01:00"
-    assert entry["level"] == LogLevel.ERROR
-    assert entry["message"] == "Something failed"
+    assert entry.timestamp == "2026-04-10 10:01:00"
+    assert entry.level == LogLevel.ERROR
+    assert entry.message == "Something failed"
 
 
 def test_log_parser_returns_none_for_empty_message() -> None:

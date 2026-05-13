@@ -39,10 +39,10 @@ def test_log_loader_loads_valid_entries(tmp_path: Path) -> None:
     entries = list(LogLoader(log_file).load())
 
     assert len(entries) == 2
-    assert entries[0]["level"] == LogLevel.INFO
-    assert entries[1]["level"] == LogLevel.ERROR
-    assert entries[0]["message"] == "Application started"
-    assert entries[1]["message"] == "Something failed"
+    assert entries[0].level == LogLevel.INFO
+    assert entries[1].level == LogLevel.ERROR
+    assert entries[0].message == "Application started"
+    assert entries[1].message == "Something failed"
 
 
 def test_log_loader_skips_blank_lines(tmp_path: Path) -> None:
@@ -63,8 +63,8 @@ def test_log_loader_skips_blank_lines(tmp_path: Path) -> None:
     entries = list(LogLoader(log_file).load())
 
     assert len(entries) == 2
-    assert entries[0]["message"] == "Application started"
-    assert entries[1]["message"] == "Something failed"
+    assert entries[0].message == "Application started"
+    assert entries[1].message == "Something failed"
 
 
 def test_log_loader_logs_warning_for_malformed_line(
@@ -138,4 +138,4 @@ def test_log_loader_uses_injected_parser(tmp_path: Path) -> None:
 
     entries = list(loader.load())
 
-    assert entries[0]["message"] == "FAKE"
+    assert entries[0].message == "FAKE"
