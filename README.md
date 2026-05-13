@@ -1,5 +1,7 @@
 # Log Analyzer
 
+[![Tests](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml/badge.svg)](https://github.com/notuxius/log-analyzer/actions/workflows/python-tests.yml)
+
 A modular Python CLI application for analyzing log files and generating formatted reports.
 
 The project demonstrates modern Python development practices including:
