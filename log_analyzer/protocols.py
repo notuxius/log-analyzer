@@ -5,6 +5,10 @@ from typing import Protocol
 from log_analyzer.models import LogEntry, LogSummary
 
 
+class Parser(Protocol):
+    def parse(self, line: str) -> LogEntry | None: ...
+
+
 class Loader(Protocol):
     def load(self) -> Iterator[LogEntry]: ...
 

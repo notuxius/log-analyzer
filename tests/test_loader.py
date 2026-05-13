@@ -8,6 +8,7 @@ from log_analyzer.exceptions import (
 )
 from log_analyzer.loader import LogLoader
 from log_analyzer.models import LogLevel
+from tests.fakes.fake_parser import FakeParser
 
 
 def test_log_loader_returns_iterator(tmp_path: Path) -> None:
@@ -120,3 +121,21 @@ def test_log_loader_raises_for_missing_file(tmp_path: Path) -> None:
 
     with pytest.raises(LogFileNotFoundError, match="doesn't exist"):
         list(LogLoader(missing_file).load())
+
+
+def test_log_loader_uses_injected_parser(tmp_path: Path) -> None:
+    log_file = tmp_path / "log.txt"
+
+    log_file.write_text(
+        "anything",
+        encoding="utf-8",
+    )
+
+    loader = LogLoader(
+        log_file,
+        parser=FakeParser(),
+    )
+
+    entries = list(loader.load())
+
+    assert entries[0]["message"] == "FAKE"

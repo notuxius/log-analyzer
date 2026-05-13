@@ -8,13 +8,19 @@ from log_analyzer.exceptions import (
 from log_analyzer.logger import AppLogger
 from log_analyzer.models import LogEntry
 from log_analyzer.parser import LogParser
+from log_analyzer.protocols import Parser
 
 
 class LogLoader:
-    def __init__(self, log_file: str | Path, logger: AppLogger | None = None) -> None:
+    def __init__(
+        self,
+        log_file: str | Path,
+        parser: Parser | None = None,
+        logger: AppLogger | None = None,
+    ) -> None:
         self.log_file = Path(log_file)
+        self.parser = parser or LogParser()
         self.logger = logger or AppLogger()
-        self.parser = LogParser()
 
     def _read_lines(self) -> Iterator[str]:
         if not self.log_file.exists():
