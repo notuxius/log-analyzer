@@ -1,7 +1,7 @@
 [project]
 name = "log-analyzer"
-version = "1.0.0"
-description = "CLI tool to analyze log files and generate reports"
+version = "1.1.0"
+description = "A modular Python CLI application for analyzing log files and generating formatted reports."
 authors = [{ name = "Alexander Mentyu" }]
 readme = "README.md"
 requires-python = ">=3.11"
