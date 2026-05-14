@@ -10,6 +10,7 @@ def test_main_success(tmp_path, capsys, monkeypatch):
     log_file.write_text(
         "\n".join(
             [
+                "2026-04-26 09:00:00 DEBUG Application initialized",
                 "2026-04-26 09:00:00 INFO Application started",
                 "2026-04-26 09:01:12 INFO Loaded configuration",
                 "2026-04-26 09:03:45 WARNING Disk usage above 80 percent",
@@ -45,7 +46,8 @@ def test_main_success(tmp_path, capsys, monkeypatch):
 
     captured = capsys.readouterr()
     expected_report = textwrap.dedent("""\
-        Total lines: 8
+        Total lines: 9
+        DEBUG: 1
         INFO: 4
         WARNING: 2
         ERROR: 2

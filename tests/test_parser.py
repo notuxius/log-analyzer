@@ -27,6 +27,17 @@ def test_log_parser_parses_valid_error_entry() -> None:
     assert entry.message == "Something failed"
 
 
+def test_log_parser_parses_valid_debug_entry() -> None:
+    line = "2026-04-10 10:01:00 DEBUG Application initialized"
+
+    entry = LogParser().parse(line)
+
+    assert entry is not None
+    assert entry.timestamp == "2026-04-10 10:01:00"
+    assert entry.level == LogLevel.DEBUG
+    assert entry.message == "Application initialized"
+
+
 def test_log_parser_returns_none_for_empty_message() -> None:
     line = "2026-04-10 10:00:00 INFO    "
 

@@ -4,6 +4,7 @@ from typing import TypedDict
 
 
 class LogLevel(StrEnum):
+    DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"
@@ -18,6 +19,7 @@ class LogEntry:
 
 class LogSummary(TypedDict):
     total_lines: int
+    debug_count: int
     info_count: int
     warning_count: int
     error_count: int

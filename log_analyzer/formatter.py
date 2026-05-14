@@ -11,6 +11,7 @@ class TextFormatter:
     def format(self, summary: LogSummary) -> str:
         lines = [
             f"Total lines: {summary['total_lines']}",
+            f"DEBUG: {summary['debug_count']}",
             f"INFO: {summary['info_count']}",
             f"WARNING: {summary['warning_count']}",
             f"ERROR: {summary['error_count']}",

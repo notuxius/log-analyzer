@@ -8,6 +8,11 @@ def test_log_summarizer_returns_expected_summary():
     entries: list[LogEntry] = [
         LogEntry(
             timestamp="2026-04-10 10:00:00",
+            level=LogLevel.DEBUG,
+            message="Application initialized",
+        ),
+        LogEntry(
+            timestamp="2026-04-10 10:00:00",
             level=LogLevel.INFO,
             message="Application started",
         ),
@@ -26,7 +31,8 @@ def test_log_summarizer_returns_expected_summary():
     summary = LogSummarizer().summarize(entries)
 
     assert summary == {
-        "total_lines": 3,
+        "total_lines": 4,
+        "debug_count": 1,
         "info_count": 1,
         "warning_count": 1,
         "error_count": 1,
