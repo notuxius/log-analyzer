@@ -1,10 +1,7 @@
 import json
 import textwrap
 
-from log_analyzer.formatter import (
-    JsonFormatter,
-    TextFormatter,
-)
+from log_analyzer.formatter import CsvFormatter, JsonFormatter, TextFormatter
 from log_analyzer.models import LogSummary
 
 
@@ -61,3 +58,21 @@ def test_json_formatter_returns_valid_json():
     report = JsonFormatter().format(summary)
 
     assert json.loads(report) == summary
+
+
+def test_csv_formatter_returns_csv_report() -> None:
+    summary: LogSummary = {
+        "total_lines": 3,
+        "debug_count": 1,
+        "info_count": 1,
+        "warning_count": 0,
+        "error_count": 1,
+        "error_messages": ["Something failed"],
+    }
+
+    report = CsvFormatter().format(summary)
+
+    assert "metric,value" in report
+    assert "total_lines,3" in report
+    assert "debug_count,1" in report
+    assert "error_messages,Something failed" in report

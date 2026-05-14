@@ -18,7 +18,7 @@ The project demonstrates modern Python development practices including:
 # Features
 
 - Parse log files using regex-based parsing
-- Generate TXT or JSON reports
+- Generate TXT, JSON or CSV reports
 - Stream log files lazily using iterators
 - Detect malformed log entries
 - Validate log levels
@@ -46,7 +46,7 @@ LogSummarizer
     Aggregates log statistics and error messages
 
 Formatter
-    Generates report output (TXT or JSON)
+    Generates report output (TXT, JSON or CSV)
 
 ReportSaver
     Saves reports to disk

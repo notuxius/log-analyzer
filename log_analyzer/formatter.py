@@ -1,4 +1,6 @@
+import csv
 import json
+from io import StringIO
 
 from log_analyzer.exceptions import (
     UnsupportedFormatError,
@@ -33,10 +35,27 @@ class JsonFormatter:
         return json.dumps(summary, indent=2)
 
 
+class CsvFormatter:
+    def format(self, summary: LogSummary) -> str:
+        output = StringIO()
+        writer = csv.writer(output)
+
+        writer.writerow(["metric", "value"])
+        writer.writerow(["total_lines", summary["total_lines"]])
+        writer.writerow(["debug_count", summary["debug_count"]])
+        writer.writerow(["info_count", summary["info_count"]])
+        writer.writerow(["warning_count", summary["warning_count"]])
+        writer.writerow(["error_count", summary["error_count"]])
+        writer.writerow(["error_messages", "; ".join(summary["error_messages"])])
+
+        return output.getvalue().strip()
+
+
 class FormatterFactory:
     FORMATTERS = {
         "txt": TextFormatter,
         "json": JsonFormatter,
+        "csv": CsvFormatter,
     }
 
     @staticmethod
