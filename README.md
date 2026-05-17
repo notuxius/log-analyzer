@@ -205,7 +205,6 @@ uv run black .
 
 Possible future enhancements:
 
-- CSV formatter
 - HTML formatter
 - Async log processing
 - Plugin formatter system
