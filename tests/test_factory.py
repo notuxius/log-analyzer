@@ -6,6 +6,7 @@ from log_analyzer.exceptions import (
 from log_analyzer.formatter import (
     CsvFormatter,
     FormatterFactory,
+    HtmlFormatter,
     JsonFormatter,
     TextFormatter,
 )
@@ -27,6 +28,12 @@ def test_formatter_factory_returns_csv_formatter() -> None:
     formatter = FormatterFactory.create("csv")
 
     assert isinstance(formatter, CsvFormatter)
+
+
+def test_formatter_factory_returns_html_formatter() -> None:
+    formatter = FormatterFactory.create("html")
+
+    assert isinstance(formatter, HtmlFormatter)
 
 
 def test_formatter_factory_raises_for_unsupported_format():

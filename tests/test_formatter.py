@@ -1,7 +1,12 @@
 import json
 import textwrap
 
-from log_analyzer.formatter import CsvFormatter, JsonFormatter, TextFormatter
+from log_analyzer.formatter import (
+    CsvFormatter,
+    HtmlFormatter,
+    JsonFormatter,
+    TextFormatter,
+)
 from log_analyzer.models import LogSummary
 
 
@@ -76,3 +81,21 @@ def test_csv_formatter_returns_csv_report() -> None:
     assert "total_lines,3" in report
     assert "debug_count,1" in report
     assert "error_messages,Something failed" in report
+
+
+def test_html_formatter_returns_html_report() -> None:
+    summary: LogSummary = {
+        "total_lines": 3,
+        "debug_count": 1,
+        "info_count": 1,
+        "warning_count": 0,
+        "error_count": 1,
+        "error_messages": ["Something failed"],
+    }
+
+    report = HtmlFormatter().format(summary)
+
+    assert "<html>" in report
+    assert "<h1>Log Report</h1>" in report
+    assert "<li>DEBUG: 1</li>" in report
+    assert "<li>Something failed</li>" in report

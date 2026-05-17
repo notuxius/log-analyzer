@@ -51,11 +51,44 @@ class CsvFormatter:
         return output.getvalue().strip()
 
 
+class HtmlFormatter:
+    def format(self, summary: LogSummary) -> str:
+        error_items = "\n".join(
+            f"<li>{error_message}</li>" for error_message in summary["error_messages"]
+        )
+
+        if not error_items:
+            error_items = "<li>(none)</li>"
+
+        return f"""<!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Log Report</title>
+                </head>
+                <body>
+                    <h1>Log Report</h1>
+                    <ul>
+                        <li>Total lines: {summary["total_lines"]}</li>
+                        <li>DEBUG: {summary["debug_count"]}</li>
+                        <li>INFO: {summary["info_count"]}</li>
+                        <li>WARNING: {summary["warning_count"]}</li>
+                        <li>ERROR: {summary["error_count"]}</li>
+                    </ul>
+                    <h2>Error messages</h2>
+                    <ul>
+                        {error_items}
+                    </ul>
+                </body>
+                </html>"""
+
+
 class FormatterFactory:
     FORMATTERS = {
         "txt": TextFormatter,
         "json": JsonFormatter,
         "csv": CsvFormatter,
+        "html": HtmlFormatter,
     }
 
     @staticmethod

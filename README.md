@@ -1,7 +1,5 @@
 # Log Analyzer
 
-[![Tests](https://github.com/notuxius/log-analyzer/actions/workflows/tests.yml/badge.svg)](https://github.com/notuxius/log-analyzer/actions/workflows/tests.yml)
-
 A modular Python CLI application for analyzing log files and generating formatted reports.
 
 The project demonstrates modern Python development practices including:
@@ -18,16 +16,17 @@ The project demonstrates modern Python development practices including:
 # Features
 
 - Parse log files using regex-based parsing
-- Generate TXT, JSON or CSV reports
+- Generate TXT, JSON, CSV, or HTML reports
 - Stream log files lazily using iterators
 - Detect malformed log entries
 - Validate log levels
+- Support DEBUG, INFO, WARNING, and ERROR levels
 - Configurable CLI interface
 - JSON configuration support
 - Structured logging
 - Dependency injection with protocols
 - Fully tested architecture
-- 100% test coverage
+- More than 80% test coverage
 
 ---
 
@@ -46,7 +45,7 @@ LogSummarizer
     Aggregates log statistics and error messages
 
 Formatter
-    Generates report output (TXT, JSON or CSV)
+    Generates report output (TXT, JSON, CSV, HTML)
 
 ReportSaver
     Saves reports to disk
@@ -59,6 +58,43 @@ The project follows:
 - Single Responsibility Principle (SRP)
 - Dependency Injection (DI)
 - Protocol-oriented design
+
+---
+
+# Project Structure
+
+```text
+log_analyzer/
+├── config.py
+├── config_loader.py
+├── constants.py
+├── container.py
+├── exceptions.py
+├── formatter.py
+├── loader.py
+├── logger.py
+├── main.py
+├── models.py
+├── parser.py
+├── processor.py
+├── protocols.py
+├── saver.py
+└── summarizer.py
+
+tests/
+├── fakes/
+├── test_config.py
+├── test_config_loader.py
+├── test_container.py
+├── test_formatter.py
+├── test_loader.py
+├── test_logger.py
+├── test_main.py
+├── test_parser.py
+├── test_processor.py
+├── test_saver.py
+└── test_summarizer.py
+```
 
 ---
 
@@ -95,6 +131,22 @@ uv run log-analyzer \
     --format json
 ```
 
+## Generate CSV report
+
+```bash
+uv run log-analyzer \
+    --input logs/sample.txt \
+    --format csv
+```
+
+## Generate HTML report
+
+```bash
+uv run log-analyzer \
+    --input logs/sample.txt \
+    --format html
+```
+
 ## Print report to console
 
 ```bash
@@ -117,11 +169,20 @@ uv run log-analyzer \
     --verbose
 ```
 
+## Suppress informational logs
+
+```bash
+uv run log-analyzer \
+    --input logs/sample.txt \
+    --quiet
+```
+
 ---
 
 # Example Input
 
 ```text
+2026-04-10 09:59:59 DEBUG Initializing application
 2026-04-10 10:00:00 INFO Application started
 2026-04-10 10:01:00 WARNING High memory usage
 2026-04-10 10:02:00 ERROR Database connection failed
@@ -132,7 +193,8 @@ uv run log-analyzer \
 # Example TXT Output
 
 ```text
-Total lines: 3
+Total lines: 4
+DEBUG: 1
 INFO: 1
 WARNING: 1
 ERROR: 1
@@ -142,18 +204,46 @@ Error messages:
 
 ---
 
-# Example JSON Output
+# Example CSV Output
 
-```json
-{
-    "total_lines": 3,
-    "info_count": 1,
-    "warning_count": 1,
-    "error_count": 1,
-    "error_messages": [
-        "Database connection failed"
-    ]
-}
+```csv
+metric,value
+total_lines,4
+debug_count,1
+info_count,1
+warning_count,1
+error_count,1
+error_messages,Database connection failed
+```
+
+---
+
+# Example HTML Output
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Log Report</title>
+</head>
+<body>
+    <h1>Log Report</h1>
+    <ul>
+        <li>Total lines: 4</li>
+        <li>DEBUG: 1</li>
+        <li>INFO: 1</li>
+        <li>WARNING: 1</li>
+        <li>ERROR: 1</li>
+    </ul>
+
+    <h2>Error messages</h2>
+
+    <ul>
+        <li>Database connection failed</li>
+    </ul>
+</body>
+</html>
 ```
 
 ---
@@ -179,7 +269,7 @@ uv run pytest -v --cov=log_analyzer --cov-report=term-missing
 Linting:
 
 ```bash
-uv run ruff check .
+uv run ruff check . --fix
 ```
 
 Formatting:
@@ -192,7 +282,7 @@ uv run black .
 
 # Technologies Used
 
-- Python 3.11
+- Python 3.11+
 - pytest
 - pytest-cov
 - Ruff
@@ -205,10 +295,9 @@ uv run black .
 
 Possible future enhancements:
 
-- HTML formatter
-- Async log processing
-- Plugin formatter system
-- Compressed log support
+- Compressed log support (.gz)
 - Rich terminal UI
+- Plugin formatter system
+- Async log processing
 - Parallel processing
-- Real-time log monitoring
+- Real-time log mon

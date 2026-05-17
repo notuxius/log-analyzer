@@ -27,8 +27,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--format",
         default="txt",
-        choices=["txt", "json", "csv"],
-        help="Output format: text or json.",
+        choices=["txt", "json", "csv", "html"],
+        help="Output format: txt, json, csv or json.",
     )
     parser.add_argument(
         "--log-level",
