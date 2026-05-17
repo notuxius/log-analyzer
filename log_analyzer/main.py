@@ -80,7 +80,7 @@ def main() -> int:
                 input_path=args.input, output_path=args.output, format_type=args.format
             )
 
-        container = AppContainer(config)
+        container = AppContainer(config, logger)
 
         log_report, saved_path = container.run()
 

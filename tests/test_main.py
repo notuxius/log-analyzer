@@ -134,7 +134,7 @@ def test_main_success_with_config_file(tmp_path, monkeypatch):
     assert "ERROR: 1" in output_file.read_text(encoding="utf-8")
 
 
-def test_main_quiet_suppresses_info_logs(tmp_path, caplog, monkeypatch):
+def test_main_quiet_suppresses_info_logs(tmp_path, capsys, monkeypatch):
     log_file = tmp_path / "log.txt"
 
     log_file.write_text(
@@ -156,9 +156,10 @@ def test_main_quiet_suppresses_info_logs(tmp_path, caplog, monkeypatch):
     )
 
     return_code = main()
+    captured = capsys.readouterr()
 
     assert return_code == 0
-    assert "Report saved to" not in caplog.text
+    assert "Report saved to" not in captured.err
 
 
 def test_main_debug_shows_debug_logs(tmp_path, capsys, monkeypatch):

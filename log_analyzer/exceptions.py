@@ -10,6 +10,10 @@ class EmptyLogFileError(LogAnalyzerError):
     """Raised when the log file has no usable content."""
 
 
+class InvalidConfigError(LogAnalyzerError):
+    """Raised when the config file is invalid."""
+
+
 class InvalidLogLevelError(LogAnalyzerError):
     """Raised when a log entry contains an unsupported level."""
 
