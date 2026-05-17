@@ -2,6 +2,7 @@ from pathlib import Path
 
 from log_analyzer.config import AppConfig
 from log_analyzer.container import AppContainer
+from log_analyzer.logger import AppLogger
 
 
 def test_app_container_runs_pipeline(tmp_path: Path) -> None:
@@ -24,7 +25,7 @@ def test_app_container_runs_pipeline(tmp_path: Path) -> None:
         format_type="txt",
     )
 
-    container = AppContainer(config)
+    container = AppContainer(config=config, logger=AppLogger())
     report, saved_path = container.run()
 
     assert saved_path == output_path.resolve()

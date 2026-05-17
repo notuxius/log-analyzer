@@ -88,8 +88,11 @@ def main() -> int:
             print(log_report)
             print()
 
-        logger.info("Report saved to: %s", saved_path)
+        if not args.quiet:
+            logger.info("Report saved to: %s", saved_path)
+
         return 0
+
     except LogAnalyzerError as error:
         logger.error("%s", error)
         return 1
