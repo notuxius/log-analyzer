@@ -1,3 +1,4 @@
+import gzip
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -22,13 +23,19 @@ class LogLoader:
         self.parser = parser or LogParser()
         self.logger = logger or AppLogger()
 
+    def _iter_file_lines(self, file) -> Iterator[str]:
+        for line in file:
+            yield line.rstrip("\n")
+
     def _read_lines(self) -> Iterator[str]:
         if not self.log_file.exists():
             raise LogFileNotFoundError(f"Log file {self.log_file} doesn't exist.")
-
-        with self.log_file.open(encoding="utf-8") as file:
-            for line in file:
-                yield line.rstrip("\n")
+        if self.log_file.suffix == ".gz":
+            with gzip.open(self.log_file, mode="rt", encoding="utf-8") as file:
+                yield from self._iter_file_lines(file)
+        else:
+            with self.log_file.open(encoding="utf-8") as file:
+                yield from self._iter_file_lines(file)
 
     def _parse_line(self, line: str) -> LogEntry | None:
         log_entry = self.parser.parse(line)

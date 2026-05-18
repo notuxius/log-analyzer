@@ -1,3 +1,4 @@
+import gzip
 from pathlib import Path
 
 import pytest
@@ -65,6 +66,18 @@ def test_log_loader_skips_blank_lines(tmp_path: Path) -> None:
     assert len(entries) == 2
     assert entries[0].message == "Application started"
     assert entries[1].message == "Something failed"
+
+
+def test_log_loader_reads_gzip_file(tmp_path: Path) -> None:
+    log_file = tmp_path / "log.txt.gz"
+
+    with gzip.open(log_file, mode="wt", encoding="utf-8") as file:
+        file.write("2026-04-10 10:00:00 INFO Application started\n")
+
+    entries = list(LogLoader(log_file).load())
+
+    assert len(entries) == 1
+    assert entries[0].message == "Application started"
 
 
 def test_log_loader_logs_warning_for_malformed_line(

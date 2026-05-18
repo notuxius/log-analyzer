@@ -16,6 +16,7 @@ The project demonstrates modern Python development practices including:
 # Features
 
 - Parse log files using regex-based parsing
+- Read plain text and `.gz` compressed log files
 - Generate TXT, JSON, CSV, or HTML reports
 - Stream log files lazily using iterators
 - Detect malformed log entries
@@ -121,6 +122,7 @@ uv sync
 
 ```bash
 uv run log-analyzer --input logs/sample.txt
+uv run log-analyzer --input logs/sample.txt.gz
 ```
 
 ## Generate JSON report
@@ -295,7 +297,6 @@ uv run black .
 
 Possible future enhancements:
 
-- Compressed log support (.gz)
 - Rich terminal UI
 - Plugin formatter system
 - Async log processing
