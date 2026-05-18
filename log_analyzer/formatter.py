@@ -84,21 +84,39 @@ class HtmlFormatter:
 
 
 class FormatterFactory:
-    FORMATTERS = {
-        "txt": TextFormatter,
-        "json": JsonFormatter,
-        "csv": CsvFormatter,
-        "html": HtmlFormatter,
-    }
+    FORMATTER_REGISTRY: dict[str, type[Formatter]] = {}
 
-    @staticmethod
-    def create(format_type: str) -> Formatter:
+    @classmethod
+    def register(
+        cls,
+        name: str,
+        formatter_class: type[Formatter],
+    ) -> None:
+        cls.FORMATTER_REGISTRY[name.lower()] = formatter_class
+
+    @classmethod
+    def create(cls, format_type: str) -> Formatter:
         format_type = format_type.lower()
         try:
-            formatter_class = FormatterFactory.FORMATTERS[format_type]
+            formatter_class = cls.FORMATTER_REGISTRY[format_type]
         except KeyError as error:
             raise UnsupportedFormatError(
                 f"Unsupported format: {format_type}"
             ) from error
 
         return formatter_class()
+
+
+BUILTIN_FORMATTERS: dict[str, type[Formatter]] = {
+    "txt": TextFormatter,
+    "json": JsonFormatter,
+    "csv": CsvFormatter,
+    "html": HtmlFormatter,
+}
+
+for name, formatter_class in BUILTIN_FORMATTERS.items():
+    FormatterFactory.register(name, formatter_class)
+
+
+def available_formats() -> tuple[str, ...]:
+    return tuple(FormatterFactory.FORMATTER_REGISTRY)

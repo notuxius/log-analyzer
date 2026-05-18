@@ -5,6 +5,7 @@ from log_analyzer.config_loader import ConfigLoader
 from log_analyzer.constants import APP_NAME, APP_VERSION
 from log_analyzer.container import AppContainer
 from log_analyzer.exceptions import LogAnalyzerError
+from log_analyzer.formatter import available_formats
 from log_analyzer.logger import AppLogger
 
 
@@ -27,8 +28,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--format",
         default="txt",
-        choices=["txt", "json", "csv", "html"],
-        help="Output format: txt, json, csv or json.",
+        choices=available_formats(),
+        help=f"Output format: {', '.join(available_formats())}.",
     )
     parser.add_argument(
         "--log-level",

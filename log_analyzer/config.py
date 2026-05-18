@@ -29,7 +29,7 @@ class AppConfig:
     def __post_init__(self) -> None:
         self.format_type = self.format_type.lower()
 
-        if self.format_type not in FormatterFactory.FORMATTERS:
+        if self.format_type not in FormatterFactory.FORMATTER_REGISTRY:
             raise UnsupportedFormatError(f"Unsupported format: {self.format_type}")
 
         if not self.output_path.suffix:

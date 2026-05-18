@@ -3,11 +3,30 @@ import textwrap
 
 from log_analyzer.formatter import (
     CsvFormatter,
+    FormatterFactory,
     HtmlFormatter,
     JsonFormatter,
     TextFormatter,
 )
 from log_analyzer.models import LogSummary
+from tests.fakes.fake_formatter import FakeFormatter
+
+
+def test_formatter_factory_registers_custom_formatter() -> None:
+    FormatterFactory.register("fake", FakeFormatter)
+
+    formatter = FormatterFactory.create("fake")
+
+    summary: LogSummary = {
+        "total_lines": 1,
+        "debug_count": 0,
+        "info_count": 1,
+        "warning_count": 0,
+        "error_count": 0,
+        "error_messages": [],
+    }
+
+    assert formatter.format(summary) == "Processed 1 entries"
 
 
 def test_text_formatter_returns_placeholder_when_no_errors():
