@@ -1,6 +1,8 @@
 import gzip
+import time
 from collections.abc import Iterator
 from pathlib import Path
+from typing import TextIO
 
 from log_analyzer.exceptions import (
     EmptyLogFileError,
@@ -22,8 +24,9 @@ class LogLoader:
         self.log_file = Path(log_file)
         self.parser = parser or LogParser()
         self.logger = logger or AppLogger()
+        self._running = False
 
-    def _iter_file_lines(self, file) -> Iterator[str]:
+    def _iter_file_lines(self, file: TextIO) -> Iterator[str]:
         for line in file:
             yield line.rstrip("\n")
 
@@ -62,3 +65,32 @@ class LogLoader:
 
         if not has_content:
             raise EmptyLogFileError("Log file cannot be empty.")
+
+    def follow(self, poll_interval: float = 1.0) -> Iterator[LogEntry]:
+        if not self.log_file.exists():
+            raise LogFileNotFoundError(f"Log file {self.log_file} doesn't exist.")
+
+        self._running = True
+
+        with self.log_file.open(encoding="utf-8") as file:
+            file.seek(0, 2)
+
+            while self._running:
+                line = file.readline()
+
+                if not line:
+                    time.sleep(poll_interval)
+                    continue
+
+                line = line.rstrip("\n")
+
+                if not line.strip():
+                    continue
+
+                log_entry = self._parse_line(line)
+
+                if log_entry is not None:
+                    yield log_entry
+
+    def stop(self) -> None:
+        self._running = False

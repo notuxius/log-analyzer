@@ -2,6 +2,7 @@ import argparse
 
 from log_analyzer.config import AppConfig
 from log_analyzer.config_loader import ConfigLoader
+from log_analyzer.console import AppConsole
 from log_analyzer.constants import APP_NAME, APP_VERSION
 from log_analyzer.container import AppContainer
 from log_analyzer.exceptions import LogAnalyzerError
@@ -19,6 +20,9 @@ def parse_args() -> argparse.Namespace:
         "--input",
         default="logs/sample.txt",
         help="Path to input log file.",
+    )
+    parser.add_argument(
+        "--follow", action="store_true", help="Watch the log file for new entries."
     )
     parser.add_argument(
         "--output",
@@ -83,10 +87,18 @@ def main() -> int:
 
         container = AppContainer(config, logger)
 
+        if args.follow:
+            logger.info("Watching log file: %s", config.input_path)
+
+            for entry in container.create_loader().follow():
+                print(f"{entry.timestamp} {entry.level} {entry.message}")
+
+            return 0
+
         log_report, saved_path = container.run()
 
         if args.print_report:
-            print(log_report)
+            AppConsole().print_report(log_report)
             print()
 
         if not args.quiet:

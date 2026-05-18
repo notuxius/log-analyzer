@@ -297,8 +297,5 @@ uv run black .
 
 Possible future enhancements:
 
-- Rich terminal UI
-- Plugin formatter system
 - Async log processing
 - Parallel processing
-- Real-time log mon

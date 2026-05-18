@@ -56,7 +56,12 @@ def test_main_success(tmp_path, capsys, monkeypatch):
         - Timeout while calling external API
         """).strip()
 
-    assert captured.out.strip() == expected_report
+    assert "Total lines: 9" in captured.out
+    assert "DEBUG: 1" in captured.out
+    assert "INFO: 4" in captured.out
+    assert "ERROR: 2" in captured.out
+    assert "Database connection failed" in captured.out
+    assert "Timeout while calling external API" in captured.out
     assert output_file.read_text(encoding="utf-8") == expected_report
 
 

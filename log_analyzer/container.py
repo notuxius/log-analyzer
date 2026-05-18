@@ -20,10 +20,16 @@ class AppContainer:
 
     def create_processor(self) -> LogProcessor:
         return LogProcessor(
-            loader=LogLoader(self.config.input_path),
-            summarizer=LogSummarizer(),
+            loader=self.create_loader(),
+            summarizer=self.create_summarizer(),
             formatter=self.create_formatter(),
         )
+
+    def create_loader(self) -> LogLoader:
+        return LogLoader(self.config.input_path, logger=self.logger)
+
+    def create_summarizer(self) -> LogSummarizer:
+        return LogSummarizer()
 
     def create_saver(self) -> Saver:
         return ReportSaver(self.config.output_path)

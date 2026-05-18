@@ -12,6 +12,15 @@ from log_analyzer.models import LogLevel
 from tests.fakes.fake_parser import FakeParser
 
 
+def test_log_loader_follow_exists(tmp_path: Path) -> None:
+    log_file = tmp_path / "log.txt"
+    log_file.write_text("", encoding="utf-8")
+
+    loader = LogLoader(log_file)
+
+    assert hasattr(loader, "follow")
+
+
 def test_log_loader_returns_iterator(tmp_path: Path) -> None:
     log_file = tmp_path / "log.txt"
 

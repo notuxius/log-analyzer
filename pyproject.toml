@@ -5,6 +5,9 @@ description = "A modular Python CLI application for analyzing log files and gene
 authors = [{ name = "Alexander Mentyu" }]
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = [
+    "rich>=15.0.0",
+]
 
 [project.scripts]
 log-analyzer = "log_analyzer.main:main"
