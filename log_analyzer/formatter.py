@@ -1,10 +1,9 @@
 import csv
 import json
+from importlib.metadata import entry_points
 from io import StringIO
 
-from log_analyzer.exceptions import (
-    UnsupportedFormatError,
-)
+from log_analyzer.exceptions import UnsupportedFormatError
 from log_analyzer.models import LogSummary
 from log_analyzer.protocols import Formatter
 
@@ -116,6 +115,17 @@ BUILTIN_FORMATTERS: dict[str, type[Formatter]] = {
 
 for name, formatter_class in BUILTIN_FORMATTERS.items():
     FormatterFactory.register(name, formatter_class)
+
+
+def load_external_formatters() -> None:
+    discovered_formatters = entry_points(group="log_analyzer.formatters")
+
+    for entry_point in discovered_formatters:
+        formatter_class = entry_point.load()
+        FormatterFactory.register(entry_point.name, formatter_class)
+
+
+load_external_formatters()
 
 
 def available_formats() -> tuple[str, ...]:

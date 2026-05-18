@@ -7,9 +7,14 @@ from log_analyzer.formatter import (
     HtmlFormatter,
     JsonFormatter,
     TextFormatter,
+    available_formats,
 )
 from log_analyzer.models import LogSummary
 from tests.fakes.fake_formatter import FakeFormatter
+
+
+def test_available_formats_includes_builtin_formatters() -> None:
+    assert set(available_formats()) >= {"txt", "json", "csv", "html"}
 
 
 def test_formatter_factory_registers_custom_formatter() -> None:
