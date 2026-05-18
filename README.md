@@ -16,8 +16,10 @@ The project demonstrates modern Python development practices including:
 # Features
 
 - Parse log files using regex-based parsing
-- Read plain text and `.gz` compressed log files
 - Generate TXT, JSON, CSV, or HTML reports
+- Read plain text and `.gz` compressed log files
+- Real-time log monitoring with `--follow`
+- Rich terminal UI for console report output
 - Stream log files lazily using iterators
 - Detect malformed log entries
 - Validate log levels
@@ -27,7 +29,7 @@ The project demonstrates modern Python development practices including:
 - Structured logging
 - Dependency injection with protocols
 - Fully tested architecture
-- More than 80% test coverage
+- 100% test coverage
 
 ---
 
@@ -122,7 +124,6 @@ uv sync
 
 ```bash
 uv run log-analyzer --input logs/sample.txt
-uv run log-analyzer --input logs/sample.txt.gz
 ```
 
 ## Generate JSON report
@@ -155,6 +156,21 @@ uv run log-analyzer \
 uv run log-analyzer \
     --input logs/sample.txt \
     --print-report
+```
+
+## Watch log file in real time
+
+```bash
+uv run log-analyzer \
+    --input logs/sample.txt \
+    --follow
+```
+
+## Read compressed `.gz` logs
+
+```bash
+uv run log-analyzer \
+    --input logs/sample.txt.gz
 ```
 
 ## Use configuration file
@@ -289,6 +305,7 @@ uv run black .
 - pytest-cov
 - Ruff
 - Black
+- Rich
 - uv
 
 ---
@@ -298,4 +315,14 @@ uv run black .
 Possible future enhancements:
 
 - Async log processing
-- Parallel processing
+- Multi-file log aggregation
+- Live summary dashboard
+- Advanced Rich terminal widgets
+- Plugin auto-reload support
+- Remote log streaming
+- Web UI dashboard
+- Database-backed report storage
+- Log filtering by level/date
+- Export reports to PDF
+- Alerting and notification system
+- Docker support
